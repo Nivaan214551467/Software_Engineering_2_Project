@@ -35,6 +35,8 @@ namespace Group4_Class_Attendance_System {
 			}
 		}
 
+	protected:
+
 	private:
 		/// <summary>
 		/// Required designer variable.
@@ -57,9 +59,12 @@ namespace Group4_Class_Attendance_System {
 			this->ClientSize = System::Drawing::Size(564, 339);
 			this->Name = L"Main_Screen";
 			this->Text = L"Main_Screen";
+			this->Load += gcnew System::EventHandler(this, &Main_Screen::Main_Screen_Load);
 			this->ResumeLayout(false);
 
 		}
 #pragma endregion
+	private: System::Void Main_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
+	}
 	};
 }
