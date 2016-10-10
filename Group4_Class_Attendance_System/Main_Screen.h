@@ -1,4 +1,8 @@
 #pragma once
+#include <opencv\cv.h>
+#include <opencv\highgui.h>
+
+using namespace cv;
 
 namespace Group4_Class_Attendance_System {
 
@@ -8,25 +12,16 @@ namespace Group4_Class_Attendance_System {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
-
-	/// <summary>
-	/// Summary for Main_Screen
-	/// </summary>
+	
 	public ref class Main_Screen : public System::Windows::Forms::Form
 	{
 	public:
 		Main_Screen(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
 		}
 
 	protected:
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
 		~Main_Screen()
 		{
 			if (components)
@@ -35,36 +30,120 @@ namespace Group4_Class_Attendance_System {
 			}
 		}
 
-	protected:
+	public:  
+		static System::Windows::Forms::Timer^ myTimer = gcnew System::Windows::Forms::Timer;		//Timer used to control capturing time
+		static int lectureNumber = 0;
+		static int quater = 1;
+	private: System::Windows::Forms::ComboBox^  lectrueNumComboBox;
+	public:
 
+	private: System::Windows::Forms::Label^  lectureNumberlbl;
+	private: System::Windows::Forms::Label^  chosenLecturelbl;
+
+	public:
 	private:
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
 		System::ComponentModel::Container ^components;
 
 #pragma region Windows Form Designer generated code
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
+
 		void InitializeComponent(void)
 		{
+			this->lectrueNumComboBox = (gcnew System::Windows::Forms::ComboBox());
+			this->lectureNumberlbl = (gcnew System::Windows::Forms::Label());
+			this->chosenLecturelbl = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
+			// 
+			// lectrueNumComboBox
+			// 
+			this->lectrueNumComboBox->FormattingEnabled = true;
+			this->lectrueNumComboBox->Items->AddRange(gcnew cli::array< System::Object^  >(25) {
+				L"1", L"2", L"3", L"4", L"5", L"6", L"7",
+					L"8", L"9", L"10", L"11", L"12", L"13", L"14", L"15", L"16", L"17", L"18", L"19", L"20", L"21", L"22", L"23", L"24", L"25"
+			});
+			this->lectrueNumComboBox->Location = System::Drawing::Point(258, 41);
+			this->lectrueNumComboBox->Name = L"lectrueNumComboBox";
+			this->lectrueNumComboBox->Size = System::Drawing::Size(146, 21);
+			this->lectrueNumComboBox->TabIndex = 0;
+			this->lectrueNumComboBox->SelectedIndexChanged += gcnew System::EventHandler(this, &Main_Screen::lectrueNumComboBox_SelectedIndexChanged);
+			// 
+			// lectureNumberlbl
+			// 
+			this->lectureNumberlbl->AutoSize = true;
+			this->lectureNumberlbl->Location = System::Drawing::Point(35, 44);
+			this->lectureNumberlbl->Name = L"lectureNumberlbl";
+			this->lectureNumberlbl->Size = System::Drawing::Size(217, 13);
+			this->lectureNumberlbl->TabIndex = 1;
+			this->lectureNumberlbl->Text = L"Please select the Lecture Number to begin:  ";
+			// 
+			// chosenLecturelbl
+			// 
+			this->chosenLecturelbl->AutoSize = true;
+			this->chosenLecturelbl->Location = System::Drawing::Point(268, 44);
+			this->chosenLecturelbl->Name = L"chosenLecturelbl";
+			this->chosenLecturelbl->Size = System::Drawing::Size(0, 13);
+			this->chosenLecturelbl->TabIndex = 2;
 			// 
 			// Main_Screen
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(564, 339);
+			this->ClientSize = System::Drawing::Size(578, 218);
+			this->Controls->Add(this->chosenLecturelbl);
+			this->Controls->Add(this->lectureNumberlbl);
+			this->Controls->Add(this->lectrueNumComboBox);
 			this->Name = L"Main_Screen";
 			this->Text = L"Main_Screen";
-			this->Load += gcnew System::EventHandler(this, &Main_Screen::Main_Screen_Load);
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
-	private: System::Void Main_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
+
+	private: void static TimerEventProcessor(Object^ myObject, EventArgs^ myEventArgs)
+	{
+		myTimer->Stop();
+	 
+			//Capturing image and processing goes here
+		MessageBox::Show("Taking out picture number " + quater);
+		captureImage();
+	 
+		myTimer->Enabled = true;
+	 }
+
+	 static void captureImage()
+	 {
+		 Mat capturedImage;
+		 vector<Mat> faces;
+
+		 VideoCapture cap;
+		 cap.open(0);
+		 
+		 if (!cap.isOpened())
+		 {
+			 MessageBox::Show("Error. Could not open camera.");
+		 }
+		 /*
+		 namedWindow("window", 1);
+
+		 cap >> capturedImage;
+		 imshow("window", capturedImage);
+		 */
+		 quater++;
+	 }
+
+
+
+	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
+		
+		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());
+		//MessageBox::Show("Lecture number : " + lectureNumber + " chosen.");
+		chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
+		lectrueNumComboBox->Visible = false;
+
+		myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
+		myTimer->Interval = 6000;					// Sets the timer interval to 10 minutes.
+		myTimer->Start();
+		
 	}
-	};
+};
 }

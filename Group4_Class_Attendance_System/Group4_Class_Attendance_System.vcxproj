@@ -59,6 +59,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opencv_core2413d.lib;opencv_imgproc2413d.lib;opencv_highgui2413d.lib;opencv_ml2413d.lib;opencv_video2413d.lib;opencv_features2d2413d.lib;opencv_calib3d2413d.lib;opencv_objdetect2413d.lib;opencv_contrib2413.lib;opencv_legacy2413.lib;opencv_flann2413.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\opencv2413\build\x86\vc12\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>Main</EntryPointSymbol>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -82,9 +84,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main_Screen.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Main_Screen.h">
       <FileType>CppForm</FileType>
     </ClInclude>
@@ -93,6 +92,9 @@
     <EmbeddedResource Include="Main_Screen.resx">
       <DependentUpon>Main_Screen.h</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main_Screen.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,34 +1,16 @@
 #include "Main_Screen.h"
-#include <opencv\cv.h>
-#include <opencv\highgui.h>
 
-using namespace cv;
+using namespace System; 
+using namespace System::Windows::Forms;   
 
-int main()
-{
-	
-	Mat image;
-
-	VideoCapture cap;
-	cap.open(0);
-
-	if (!cap.isOpened())
-	{
-		return -1;
-	}
-
-	namedWindow("window", 1);
-
-	while (1)
-	{
-		cap >> image;
-
-		imshow("window", image);
-
-		waitKey(33);
-		
-	}
-	
-
-
+[STAThread] void Main()			//opens the Main_Screen GUI
+{ 
+	Application::EnableVisualStyles(); 
+	Application::SetCompatibleTextRenderingDefault(false);  
+	Group4_Class_Attendance_System::Main_Screen form;
+	Application::Run(%form); 
 }
+
+
+
+
