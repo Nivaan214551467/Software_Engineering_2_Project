@@ -1,8 +1,18 @@
 #pragma once
 #include <opencv\cv.h>
 #include <opencv\highgui.h>
+#include <opencv2\core.hpp>
+#include <opencv2\contrib\contrib.hpp>
+#include <opencv2\highgui.hpp>
+#include <opencv2\imgproc.hpp>
+#include <opencv2\objdetect.hpp>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace cv;
+using namespace std;
+
 
 namespace Group4_Class_Attendance_System {
 
@@ -110,29 +120,6 @@ namespace Group4_Class_Attendance_System {
 		myTimer->Enabled = true;
 	 }
 
-	 static void captureImage()
-	 {
-		 Mat capturedImage;
-		 vector<Mat> faces;
-
-		 VideoCapture cap;
-		 cap.open(0);
-		 
-		 if (!cap.isOpened())
-		 {
-			 MessageBox::Show("Error. Could not open camera.");
-		 }
-		 /*
-		 namedWindow("window", 1);
-
-		 cap >> capturedImage;
-		 imshow("window", capturedImage);
-		 */
-		 quater++;
-	 }
-
-
-
 	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 		
 		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());
@@ -145,5 +132,90 @@ namespace Group4_Class_Attendance_System {
 		myTimer->Start();
 		
 	}
+
+
+	 static void captureImage()
+	 {
+		 Mat capturedImage;
+		 vector<Mat> faces;
+		 vector<int> ids;
+
+		 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);
+
+		 int im_width = faces[0].cols;
+		 int im_height = faces[0].rows;
+
+		 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
+		 model->train(faces, ids);
+
+		 CascadeClassifier haar_cascade;
+		 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
+
+		 VideoCapture cap;
+		 cap.open(0);
+
+		 if (!cap.isOpened())
+		 {
+			 MessageBox::Show("ERROR: Could not open camera.");
+		 }
+		 
+		 //namedWindow("window", 1);
+		 cap >> capturedImage;
+		 //imshow("window", capturedImage);
+		 
+		 Mat original = capturedImage.clone();
+		 Mat greyImage;
+		 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);
+
+		 vector<Rect_<int>> facePositions;
+		 haar_cascade.detectMultiScale(greyImage, facePositions);
+
+		 for (int i = 0; i < facePositions.size(); i++)
+		 {
+			
+			 Rect face_i = facePositions[i];
+			 Mat getFace = greyImage(face_i);
+			 Mat face_resized;
+			 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
+			 int foundID = model->predict(face_resized);
+			 //setAttendance(foundID,quater);
+
+			 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);///////////////////////////////////////////////////////////
+			 string box_text = format("ID = %d", foundID);
+			 int pos_x = std::max(face_i.tl().x - 10, 0);
+			 int pos_y = std::max(face_i.tl().y - 10, 0);
+			 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+
+		 }
+
+		 imshow("face_recognizer", original);
+		 char key = (char)waitKey(20);
+		 
+		 quater++;
+	 }
+
+	 static void read_csv(const string& filepath, vector<Mat>& images, vector<int>& labels) 
+	 {		 
+		 std::ifstream file(filepath.c_str(), ifstream::in);
+		 if (!file) 
+		 {
+			 MessageBox::Show("ERROR: Could not read CSV file.");
+		 }
+		 string line, path, classlabel;
+		 while (getline(file, line)) 
+		 {
+			 stringstream liness(line);
+			 getline(liness, path, ';');
+			 getline(liness, classlabel);
+			 if (!path.empty() && !classlabel.empty()) 
+			 {
+				 images.push_back(imread(path, 0));
+				 labels.push_back(atoi(classlabel.c_str()));
+			 }
+		 }
+	 }
+
+
+
 };
 }
