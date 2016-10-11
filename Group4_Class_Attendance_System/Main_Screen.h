@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+//#include "stdAfx.h"
+#include "Attendance_Stats_Screen.h"
 
 using namespace cv;
 using namespace std;
@@ -49,6 +51,7 @@ namespace Group4_Class_Attendance_System {
 
 	private: System::Windows::Forms::Label^  lectureNumberlbl;
 	private: System::Windows::Forms::Label^  chosenLecturelbl;
+	private: System::Windows::Forms::Button^  button1;
 
 	public:
 	private:
@@ -61,6 +64,7 @@ namespace Group4_Class_Attendance_System {
 			this->lectrueNumComboBox = (gcnew System::Windows::Forms::ComboBox());
 			this->lectureNumberlbl = (gcnew System::Windows::Forms::Label());
 			this->chosenLecturelbl = (gcnew System::Windows::Forms::Label());
+			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// lectrueNumComboBox
@@ -93,15 +97,27 @@ namespace Group4_Class_Attendance_System {
 			this->chosenLecturelbl->Size = System::Drawing::Size(0, 13);
 			this->chosenLecturelbl->TabIndex = 2;
 			// 
+			// button1
+			// 
+			this->button1->Location = System::Drawing::Point(258, 180);
+			this->button1->Name = L"button1";
+			this->button1->Size = System::Drawing::Size(208, 38);
+			this->button1->TabIndex = 3;
+			this->button1->Text = L"View Attendance Statistics";
+			this->button1->UseVisualStyleBackColor = true;
+			this->button1->Click += gcnew System::EventHandler(this, &Main_Screen::button1_Click);
+			// 
 			// Main_Screen
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(578, 218);
+			this->ClientSize = System::Drawing::Size(478, 230);
+			this->Controls->Add(this->button1);
 			this->Controls->Add(this->chosenLecturelbl);
 			this->Controls->Add(this->lectureNumberlbl);
 			this->Controls->Add(this->lectrueNumComboBox);
 			this->Name = L"Main_Screen";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Main_Screen";
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -217,5 +233,10 @@ namespace Group4_Class_Attendance_System {
 
 
 
+private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+	this->Hide();
+	Attendance_Stats_Screen^ ass = gcnew Attendance_Stats_Screen();
+	ass->ShowDialog();
+}
 };
 }

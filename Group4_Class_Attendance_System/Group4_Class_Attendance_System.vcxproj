@@ -84,16 +84,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Attendance_Stats_Screen.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Main_Screen.h">
       <FileType>CppForm</FileType>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Attendance_Stats_Screen.resx">
+      <DependentUpon>Attendance_Stats_Screen.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Main_Screen.resx">
       <DependentUpon>Main_Screen.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Attendance_Stats_Screen.cpp" />
     <ClCompile Include="Main_Screen.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
