@@ -26,6 +26,9 @@
     <EmbeddedResource Include="Main_Screen.resx">
       <Filter>Resource Files</Filter>
     </EmbeddedResource>
+    <EmbeddedResource Include="Attendance_Stats_Screen.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Screen.cpp">
