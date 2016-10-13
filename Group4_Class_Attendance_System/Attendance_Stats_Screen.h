@@ -58,14 +58,18 @@ namespace Group4_Class_Attendance_System {
 			this->Name = L"Attendance_Stats_Screen";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Attendance_Stats_Screen";
+			this->Load += gcnew System::EventHandler(this, &Attendance_Stats_Screen::Attendance_Stats_Screen_Load);
 			this->ResumeLayout(false);
 
 		}
 #pragma endregion
 
-		//************************   Make your methods here   **********************************
 
+	private: System::Void Attendance_Stats_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
+		//This method will run when screen is loaded so put connection to DB here
 
-
+		//Make a textbox and button. User will enter student number in the textbox. When button pressed, read the student 
+		//number from the textbox and get data for that student from DB. So put the other code in the "button pressed" method.
+	}
 	};
 }
