@@ -60,7 +60,7 @@ namespace Group4_Class_Attendance_System {
 	public:
 		String^ constring;
 		MySqlConnection^ conDataBase;
-		MySqlCommand^ cmdDataBase;
+
 		MySqlDataReader^ myReader;
 		static String^ studentName;
 		static String^ studentSurname;
@@ -309,26 +309,8 @@ namespace Group4_Class_Attendance_System {
 
 
 	private: System::Void Attendance_Stats_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
-		//This method will run when screen is loaded so put connection to DB here
-		/*String^ constring = L"datasource=127.0.0.1; port=3306; username=root; password=keshav";
-		MySqlConnection^ conDataBase = gcnew MySqlConnection(constring);
-		MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl;", conDataBase);
-		MySqlDataReader^ myReader;*/
-
 		constring = L"datasource=127.0.0.1; port=3306; username=root; password=keshav";
 		conDataBase = gcnew MySqlConnection(constring);
-		
-
-		try{
-			conDataBase->Open();
-			myReader = cmdDataBase->ExecuteReader();
-		} catch (Exception^ ex){
-
-			MessageBox::Show(ex->Message);
-		}
-
-		//Make a textbox and button. User will enter student number in the textbox. When button pressed, read the student 
-		//number from the textbox and get data for that student from DB. So put the other code in the "button pressed" method.
 	}
 			
 
@@ -339,26 +321,42 @@ namespace Group4_Class_Attendance_System {
 		displayData();
 	}
 			 void getData(int stdNo){
-				 cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where ID = '"+stdNo+"';", conDataBase);
-
+				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where ID = '" + stdNo + "';", conDataBase);
 				 try{
+
 					 conDataBase->Open();
 					 myReader = cmdDataBase->ExecuteReader();
-
-					 if (myReader->Read())
+					 while (myReader->Read())
 					 {
+						 for (int i = 1; i <= 25; i++)
+						 {
 
+							 if (myReader->GetString("Lecture" + i) == "a")
+							 {
+								 NoOfDaysAbsent++;
+							 }
+							 else
+							 {
+								 NoOfDaysPresent++;
+							 }
+						 }
+						 studentID = myReader->GetInt32("ID");
+						 studentName = myReader->GetString("Name");
+						 studentSurname = myReader->GetString("Surname");
 					 }
 				 }
 				 catch (Exception^ ex){
 
 					 MessageBox::Show(ex->Message);
 				 }
-				 
 
 			 }
-			 static void displayData(){
-
+			 void displayData(){
+				 textBox3->Text = Convert::ToString(studentID);
+				 nametextBox->Text = studentName;
+				 snametextBox->Text = studentSurname;
+				 abtextBox->Text = Convert::ToString(NoOfDaysAbsent);
+				 prtextBox->Text = Convert::ToString(NoOfDaysPresent);
 			 }
 };
 }
