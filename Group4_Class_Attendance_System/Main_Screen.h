@@ -132,8 +132,19 @@ namespace Group4_Class_Attendance_System {
 			//Capturing image and processing goes here
 		MessageBox::Show("Taking out picture number " + quater);
 		captureImage();
-	 
-		myTimer->Enabled = true;
+
+		if (quater > 4)
+		{
+			MessageBox::Show("..............................");
+			myTimer->Stop();
+			myTimer->Enabled = false;
+		}
+		else{
+			myTimer->Enabled = true;
+		}
+
+
+		
 	 }
 
 	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
@@ -143,8 +154,9 @@ namespace Group4_Class_Attendance_System {
 		chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
 		lectrueNumComboBox->Visible = false;
 
+		captureImage();
 		myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
-		myTimer->Interval = 6000;					// Sets the timer interval to 10 minutes.
+		myTimer->Interval = 2000;					// Sets the timer interval to 10 minutes.
 		myTimer->Start();
 		
 	}
@@ -152,61 +164,62 @@ namespace Group4_Class_Attendance_System {
 
 	 static void captureImage()
 	 {
-		 Mat capturedImage;
-		 vector<Mat> faces;
-		 vector<int> ids;
-
-		 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);
-
-		 int im_width = faces[0].cols;
-		 int im_height = faces[0].rows;
-
-		 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-		 model->train(faces, ids);
-
-		 CascadeClassifier haar_cascade;
-		 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
-
-		 VideoCapture cap;
-		 cap.open(0);
-
-		 if (!cap.isOpened())
-		 {
-			 MessageBox::Show("ERROR: Could not open camera.");
-		 }
 		 
-		 //namedWindow("window", 1);
-		 cap >> capturedImage;
-		 //imshow("window", capturedImage);
-		 
-		 Mat original = capturedImage.clone();
-		 Mat greyImage;
-		 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);
+			 Mat capturedImage;
+			 vector<Mat> faces;
+			 vector<int> ids;
 
-		 vector<Rect_<int>> facePositions;
-		 haar_cascade.detectMultiScale(greyImage, facePositions);
+			 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);
 
-		 for (int i = 0; i < facePositions.size(); i++)
-		 {
-			
-			 Rect face_i = facePositions[i];
-			 Mat getFace = greyImage(face_i);
-			 Mat face_resized;
-			 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
-			 int foundID = model->predict(face_resized);
-			 //setAttendance(foundID,quater);
+			 int im_width = faces[0].cols;
+			 int im_height = faces[0].rows;
 
-			 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);///////////////////////////////////////////////////////////
-			 string box_text = format("ID = %d", foundID);
-			 int pos_x = std::max(face_i.tl().x - 10, 0);
-			 int pos_y = std::max(face_i.tl().y - 10, 0);
-			 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+			 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
+			 model->train(faces, ids);
 
-		 }
+			 CascadeClassifier haar_cascade;
+			 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
 
-		 imshow("face_recognizer", original);
-		 char key = (char)waitKey(20);
-		 
+			 VideoCapture cap;
+			 cap.open(0);
+
+			 if (!cap.isOpened())
+			 {
+				 MessageBox::Show("ERROR: Could not open camera.");
+			 }
+
+			 //namedWindow("window", 1);
+			 cap >> capturedImage;
+			 //imshow("window", capturedImage);
+
+			 Mat original = capturedImage.clone();
+			 Mat greyImage;
+			 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);
+
+			 vector<Rect_<int>> facePositions;
+			 haar_cascade.detectMultiScale(greyImage, facePositions);
+
+			 for (int i = 0; i < facePositions.size(); i++)
+			 {
+
+				 Rect face_i = facePositions[i];
+				 Mat getFace = greyImage(face_i);
+				 Mat face_resized;
+				 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
+				 int foundID = model->predict(face_resized);
+				 //setAttendance(foundID,quater);
+
+				 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);///////////////////////////////////////////////////////////
+				 string box_text = format("ID = %d", foundID);
+				 int pos_x = std::max(face_i.tl().x - 10, 0);
+				 int pos_y = std::max(face_i.tl().y - 10, 0);
+				 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+
+			 }
+
+			 imshow("face_recognizer", original);
+			 char key = (char)waitKey(20);
+
 		 quater++;
 	 }
 
