@@ -9,11 +9,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include<string>
+#include<iostream>
 //#include "stdAfx.h"
 #include "Attendance_Stats_Screen.h"
 
 using namespace cv;
 using namespace std;
+
 
 
 namespace Group4_Class_Attendance_System {
@@ -24,10 +27,12 @@ namespace Group4_Class_Attendance_System {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
-	
+	using namespace MySql::Data::MySqlClient;
+
 	public ref class Main_Screen : public System::Windows::Forms::Form
 	{
 	public:
+
 		Main_Screen(void)
 		{
 			InitializeComponent();
@@ -42,7 +47,8 @@ namespace Group4_Class_Attendance_System {
 			}
 		}
 
-	public:  
+	public:
+
 		static System::Windows::Forms::Timer^ myTimer = gcnew System::Windows::Forms::Timer;		//Timer used to control capturing time
 		static int lectureNumber = 0;
 		static int quater = 1;
@@ -56,6 +62,17 @@ namespace Group4_Class_Attendance_System {
 	public:
 	private:
 		System::ComponentModel::Container ^components;
+		/*public :
+		String^ constring;
+		MySqlConnection^ conDataBase;*/
+	public:
+		static System::String^ constring;
+		static MySqlConnection^ conDataBase;
+		static MySqlDataReader^ myReader;
+		static System::String^ quarter1;
+		static System::String^ quarter2;
+		static System::String^ quarter3;
+		static System::String^ quarter4;
 
 #pragma region Windows Form Designer generated code
 
@@ -122,14 +139,15 @@ namespace Group4_Class_Attendance_System {
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
+
 		}
 #pragma endregion
 
 	private: void static TimerEventProcessor(Object^ myObject, EventArgs^ myEventArgs)
 	{
 		myTimer->Stop();
-	 
-			//Capturing image and processing goes here
+
+		//Capturing image and processing goes here
 		MessageBox::Show("Taking out picture number " + quater);
 		captureImage();
 
@@ -144,11 +162,11 @@ namespace Group4_Class_Attendance_System {
 		}
 
 
-		
-	 }
+
+	}
 
 	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
-		
+
 		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());
 		//MessageBox::Show("Lecture number : " + lectureNumber + " chosen.");
 		chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
@@ -158,98 +176,167 @@ namespace Group4_Class_Attendance_System {
 		myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
 		myTimer->Interval = 2000;					// Sets the timer interval to 10 minutes.
 		myTimer->Start();
-		
+
 	}
+			 void static setAttendence(int stid, int y){
+
+				 std::string qtr;
+				 if (y == 1)
+					 qtr = "quarter1";
+				 else if (y == 2)
+					 qtr = "quarter2";
+				 else if (y == 3)
+					 qtr = "quarter3";
+				 else
+					 qtr = "quarter4";
 
 
-	 static void captureImage()
-	 {
-		 
-			 Mat capturedImage;
-			 vector<Mat> faces;
-			 vector<int> ids;
+				 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+				 conDataBase = gcnew MySqlConnection(constring);
+				 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `" + qtr + "`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
+				 System::String^ sql2 = gcnew System::String(sql1.c_str());
+				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+				 MessageBox::Show(sql2);
 
-			 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);
+				 try{
 
-			 int im_width = faces[0].cols;
-			 int im_height = faces[0].rows;
+					 conDataBase->Open();
+					 myReader = cmdDataBase->ExecuteReader();
+					 MessageBox::Show("SAVED");
+					 while (myReader->Read())
+					 {
+					 }
+				 }
+				 catch (System::Exception^ ex){
 
-			 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
-			 model->train(faces, ids);
+					 MessageBox::Show(ex->Message);
+				 }
+				/* int i = 0;
+				 quarter1 = myReader->GetString("quarter1");
+				 quarter2 = myReader->GetString("quarter1");
+				 quarter3 = myReader->GetString("quarter1");
+				 quarter4 = myReader->GetString("quarter1");
+				 if (quarter1 == "present")
+					 i = i + 1;
+				 if (quarter2 == "present")
+					 i = i + 1;
+				 if (quarter3 == "present")
+					 i = i + 1;
+				 if (quarter4 == "present")
+					 i = i + 1;
+				 for (int x = 0; x <= 4; x++){
 
-			 CascadeClassifier haar_cascade;
-			 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
-
-			 VideoCapture cap;
-			 cap.open(0);
-
-			 if (!cap.isOpened())
-			 {
-				 MessageBox::Show("ERROR: Could not open camera.");
+					 if (i == 4 || quarter1 == "present" || quarter4 == "present")
+					 {
+						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `present`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
+						 System::String^ sql2 = gcnew System::String(sql1.c_str());
+						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+					 }
+					 else if ((i == 2 || i == 3) && quarter1 != "present")
+					 {
+						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `late`= 'came late' WHERE `studentID`= " + std::to_string(stid) + ";";
+						 System::String^ sql2 = gcnew System::String(sql1.c_str());
+						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+					 }
+					 else if (i == 2 || i == 3 && quarter4 != "present")
+					 {
+						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `leftearly`= 'left early' WHERE `studentID`= " + std::to_string(stid) + ";";
+						 System::String^ sql2 = gcnew System::String(sql1.c_str());
+						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+					 }
+					 x++;
+				 }*/
 			 }
 
-			 //namedWindow("window", 1);
-			 cap >> capturedImage;
-			 //imshow("window", capturedImage);
-
-			 Mat original = capturedImage.clone();
-			 Mat greyImage;
-			 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);
-
-			 vector<Rect_<int>> facePositions;
-			 haar_cascade.detectMultiScale(greyImage, facePositions);
-
-			 for (int i = 0; i < facePositions.size(); i++)
+			 static void captureImage()
 			 {
+				 Mat capturedImage;
+				 vector<Mat> faces;
+				 vector<int> ids;
 
-				 Rect face_i = facePositions[i];
-				 Mat getFace = greyImage(face_i);
-				 Mat face_resized;
-				 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
-				 int foundID = model->predict(face_resized);
-				 //setAttendance(foundID,quater);
+				 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);
 
-				 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);///////////////////////////////////////////////////////////
-				 string box_text = format("ID = %d", foundID);
-				 int pos_x = std::max(face_i.tl().x - 10, 0);
-				 int pos_y = std::max(face_i.tl().y - 10, 0);
-				 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+				 int im_width = faces[0].cols;
+				 int im_height = faces[0].rows;
 
+				 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
+				 model->train(faces, ids);
+
+				 CascadeClassifier haar_cascade;
+				 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
+
+				 VideoCapture cap;
+				 cap.open(0);
+
+				 if (!cap.isOpened())
+				 {
+					 MessageBox::Show("ERROR: Could not open camera.");
+				 }
+
+				 //namedWindow("window", 1);
+				 cap >> capturedImage;
+				 //imshow("window", capturedImage);
+
+				 Mat original = capturedImage.clone();
+				 Mat greyImage;
+				 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);
+
+				 vector<Rect_<int>> facePositions;
+				 haar_cascade.detectMultiScale(greyImage, facePositions);
+
+				 for (int i = 0; i < facePositions.size(); i++)
+				 {
+
+					 Rect face_i = facePositions[i];
+					 Mat getFace = greyImage(face_i);
+					 Mat face_resized;
+					 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
+					 int foundID = model->predict(face_resized);
+					 setAttendence(foundID, quater);
+
+
+
+					 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);///////////////////////////////////////////////////////////
+					 string box_text = format("ID = %d", foundID);
+					 int pos_x = std::max(face_i.tl().x - 10, 0);
+					 int pos_y = std::max(face_i.tl().y - 10, 0);
+					 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+
+				 }
+
+				 imshow("face_recognizer", original);
+				 char key = (char)waitKey(20);
+
+				 quater++;
 			 }
 
-			 imshow("face_recognizer", original);
-			 char key = (char)waitKey(20);
-
-		 quater++;
-	 }
-
-	 static void read_csv(const string& filepath, vector<Mat>& images, vector<int>& labels) 
-	 {		 
-		 std::ifstream file(filepath.c_str(), ifstream::in);
-		 if (!file) 
-		 {
-			 MessageBox::Show("ERROR: Could not read CSV file.");
-		 }
-		 string line, path, classlabel;
-		 while (getline(file, line)) 
-		 {
-			 stringstream liness(line);
-			 getline(liness, path, ';');
-			 getline(liness, classlabel);
-			 if (!path.empty() && !classlabel.empty()) 
+			 static void read_csv(const string& filepath, vector<Mat>& images, vector<int>& labels)
 			 {
-				 images.push_back(imread(path, 0));
-				 labels.push_back(atoi(classlabel.c_str()));
+				 std::ifstream file(filepath.c_str(), ifstream::in);
+				 if (!file)
+				 {
+					 MessageBox::Show("ERROR: Could not read CSV file.");
+				 }
+				 string line, path, classlabel;
+				 while (getline(file, line))
+				 {
+					 stringstream liness(line);
+					 getline(liness, path, ';');
+					 getline(liness, classlabel);
+					 if (!path.empty() && !classlabel.empty())
+					 {
+						 images.push_back(imread(path, 0));
+						 labels.push_back(atoi(classlabel.c_str()));
+					 }
+				 }
 			 }
-		 }
-	 }
 
 
 
-private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->Hide();
-	Attendance_Stats_Screen^ ass = gcnew Attendance_Stats_Screen();
-	ass->ShowDialog();
-}
-};
+	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+		this->Hide();
+		Attendance_Stats_Screen^ ass = gcnew Attendance_Stats_Screen();
+		ass->ShowDialog();
+	}
+	};
 }
