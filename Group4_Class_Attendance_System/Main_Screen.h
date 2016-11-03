@@ -68,10 +68,14 @@ namespace Group4_Class_Attendance_System {
 	public:
 		static System::String^ constring;
 		static MySqlConnection^ conDataBase;
+		static MySqlConnection^ conDataBase2;
 		static MySqlDataReader^ myReader;
+		static MySqlDataReader^ myReader2;
 		static System::String^ quarter1;
 		static System::String^ quarter2;
 		static System::String^ quarter3;
+	private: static System::Windows::Forms::RichTextBox^  richTextBox1;
+	public:
 		static System::String^ quarter4;
 
 #pragma region Windows Form Designer generated code
@@ -82,6 +86,7 @@ namespace Group4_Class_Attendance_System {
 			this->lectureNumberlbl = (gcnew System::Windows::Forms::Label());
 			this->chosenLecturelbl = (gcnew System::Windows::Forms::Label());
 			this->button1 = (gcnew System::Windows::Forms::Button());
+			this->richTextBox1 = (gcnew System::Windows::Forms::RichTextBox());
 			this->SuspendLayout();
 			// 
 			// lectrueNumComboBox
@@ -124,11 +129,21 @@ namespace Group4_Class_Attendance_System {
 			this->button1->UseVisualStyleBackColor = true;
 			this->button1->Click += gcnew System::EventHandler(this, &Main_Screen::button1_Click);
 			// 
+			// richTextBox1
+			// 
+			this->richTextBox1->Location = System::Drawing::Point(13, 78);
+			this->richTextBox1->Name = L"richTextBox1";
+			this->richTextBox1->ReadOnly = true;
+			this->richTextBox1->Size = System::Drawing::Size(239, 140);
+			this->richTextBox1->TabIndex = 4;
+			this->richTextBox1->Text = L"";
+			// 
 			// Main_Screen
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(478, 230);
+			this->Controls->Add(this->richTextBox1);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->chosenLecturelbl);
 			this->Controls->Add(this->lectureNumberlbl);
@@ -139,7 +154,6 @@ namespace Group4_Class_Attendance_System {
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
-
 		}
 #pragma endregion
 
@@ -148,7 +162,8 @@ namespace Group4_Class_Attendance_System {
 		myTimer->Stop();
 
 		//Capturing image and processing goes here
-		MessageBox::Show("Taking out picture number " + quater);
+		//MessageBox::Show("Taking out picture number " + quater);
+		richTextBox1->Text += "\nTaking out picture number " + quater;
 		captureImage();
 
 		if (quater > 4)
@@ -172,12 +187,28 @@ namespace Group4_Class_Attendance_System {
 		chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
 		lectrueNumComboBox->Visible = false;
 
+		constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+		conDataBase = gcnew MySqlConnection(constring);
+		std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `quarter1`= 'absent' ,`quarter2`= 'absent',`quarter3`= 'absent',`quarter4`= 'absent' WHERE `studentID` > '0' ;";
+		System::String^ sql2 = gcnew System::String(sql1.c_str());
+		MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+		try{
+			conDataBase->Open();
+			myReader = cmdDataBase->ExecuteReader();
+			//MessageBox::Show("EVERYONE IS ABSENT");
+		}
+		catch (System::Exception^ ex){
+			MessageBox::Show(ex->Message);
+		}
+		conDataBase->Close();
+
 		captureImage();
 		myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
 		myTimer->Interval = 2000;					// Sets the timer interval to 10 minutes.
 		myTimer->Start();
 
 	}
+
 			 void static setAttendence(int stid, int y){
 
 				 std::string qtr;
@@ -211,41 +242,9 @@ namespace Group4_Class_Attendance_System {
 
 					 MessageBox::Show(ex->Message);
 				 }
-				/* int i = 0;
-				 quarter1 = myReader->GetString("quarter1");
-				 quarter2 = myReader->GetString("quarter1");
-				 quarter3 = myReader->GetString("quarter1");
-				 quarter4 = myReader->GetString("quarter1");
-				 if (quarter1 == "present")
-					 i = i + 1;
-				 if (quarter2 == "present")
-					 i = i + 1;
-				 if (quarter3 == "present")
-					 i = i + 1;
-				 if (quarter4 == "present")
-					 i = i + 1;
-				 for (int x = 0; x <= 4; x++){
 
-					 if (i == 4 || quarter1 == "present" || quarter4 == "present")
-					 {
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `present`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
-					 }
-					 else if ((i == 2 || i == 3) && quarter1 != "present")
-					 {
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `late`= 'came late' WHERE `studentID`= " + std::to_string(stid) + ";";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
-					 }
-					 else if (i == 2 || i == 3 && quarter4 != "present")
-					 {
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `leftearly`= 'left early' WHERE `studentID`= " + std::to_string(stid) + ";";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
-					 }
-					 x++;
-				 }*/
+				 conDataBase->Close();
+				 
 			 }
 
 			 static void captureImage()
@@ -307,6 +306,94 @@ namespace Group4_Class_Attendance_System {
 				 imshow("face_recognizer", original);
 				 char key = (char)waitKey(20);
 
+				 if (quater == 4)
+				 {
+					 std::string sql1 = "SELECT * FROM `studentattendancedb`.`studentattendancetbl`;";
+					 System::String^ sql2 = gcnew System::String(sql1.c_str());
+					 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+					 MessageBox::Show(sql2);
+
+					 try{
+
+						 conDataBase->Open();
+						 myReader = cmdDataBase->ExecuteReader();
+						 MessageBox::Show("READ");
+						 while (myReader->Read())
+						 {
+							 quarter1 = myReader->GetString("quarter1");
+							 quarter2 = myReader->GetString("quarter2");
+							 quarter3 = myReader->GetString("quarter3");
+							 quarter4 = myReader->GetString("quarter4");
+							 int stID = myReader->GetInt32("studentID");
+							 int i = 0;
+
+							 if (quarter1 == "present")
+								 i = i + 1;
+							 if (quarter2 == "present")
+								 i = i + 1;
+							 if (quarter3 == "present")
+								 i = i + 1;
+							 if (quarter4 == "present")
+								 i = i + 1;
+
+							 if (i == 4 || (quarter1 == "present" && quarter4 == "present"))
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'present' WHERE `studentID` = '"+std::to_string(stID)+"';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
+								 MessageBox::Show("Marking...present");
+								 conDataBase2->Close();
+							 }
+							 else if ((i == 2 || i == 3) && quarter1 != "present")
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'came late' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
+								 MessageBox::Show("Marking...came late");
+								 conDataBase2->Close();
+							 }
+							 else if (i == 2 || i == 3 && quarter4 != "present")
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'left early' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
+								 //MessageBox::Show("Marking...left early");
+								 richTextBox1->Text += "Marking...left early";
+								 conDataBase2->Close();
+							 }
+							 else
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'absent' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
+								 MessageBox::Show("Marking...absent");
+								 conDataBase2->Close();
+							 }
+
+						 }
+					 }
+					 catch (System::Exception^ ex){
+
+						 MessageBox::Show(ex->Message);
+					 }
+					 conDataBase->Close();
+				 }
 				 quater++;
 			 }
 
