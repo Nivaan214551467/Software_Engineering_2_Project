@@ -68,8 +68,10 @@ namespace Group4_Class_Attendance_System {
 	public:
 		static System::String^ constring;
 		static MySqlConnection^ conDataBase;
+		static MySqlConnection^ conDataBase1;
 		static MySqlConnection^ conDataBase2;
 		static MySqlDataReader^ myReader;
+		static MySqlDataReader^ myReader1;
 		static MySqlDataReader^ myReader2;
 		static System::String^ quarter1;
 		static System::String^ quarter2;
@@ -182,31 +184,54 @@ namespace Group4_Class_Attendance_System {
 
 	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 
-		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());
-		//MessageBox::Show("Lecture number : " + lectureNumber + " chosen.");
-		chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
-		lectrueNumComboBox->Visible = false;
-
 		constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-		conDataBase = gcnew MySqlConnection(constring);
-		std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `quarter1`= 'absent' ,`quarter2`= 'absent',`quarter3`= 'absent',`quarter4`= 'absent' WHERE `studentID` > '0' ;";
-		System::String^ sql2 = gcnew System::String(sql1.c_str());
-		MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());
+
+		conDataBase1 = gcnew MySqlConnection(constring);
+		MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand("select lecture"+lectureNumber+" from studentattendancedb.studentattendancetbl;", conDataBase1);
+
 		try{
-			conDataBase->Open();
-			myReader = cmdDataBase->ExecuteReader();
-			//MessageBox::Show("EVERYONE IS ABSENT");
+			conDataBase1->Open();
+			myReader1 = cmdDataBase1->ExecuteReader();
+			myReader1->Read();
+			
+			if (myReader1->GetString("Lecture" + lectureNumber) != "unknown")
+			{
+				MessageBox::Show("Lecture "+lectureNumber+" contains data. Please choose another lecture.");
+			}
+			else{
+				MessageBox::Show("Lecture number : " + lectureNumber + " chosen.");
+				chosenLecturelbl->Text = "Lecture number : " + lectureNumber + " chosen.";
+				lectrueNumComboBox->Visible = false;
+
+
+				conDataBase = gcnew MySqlConnection(constring);
+				std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `quarter1`= 'absent' ,`quarter2`= 'absent',`quarter3`= 'absent',`quarter4`= 'absent' WHERE `studentID` > '0' ;";
+				System::String^ sql2 = gcnew System::String(sql1.c_str());
+				MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+				try{
+					conDataBase->Open();
+					myReader = cmdDataBase->ExecuteReader();
+					//MessageBox::Show("EVERYONE IS ABSENT");
+				}
+				catch (System::Exception^ ex){
+					MessageBox::Show(ex->Message);
+				}
+				conDataBase->Close();
+
+				captureImage();
+				myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
+				myTimer->Interval = 2000;					// Sets the timer interval to 10 minutes.
+				myTimer->Start();
+			}
+	
+			
 		}
 		catch (System::Exception^ ex){
+
 			MessageBox::Show(ex->Message);
 		}
-		conDataBase->Close();
-
-		captureImage();
-		myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
-		myTimer->Interval = 2000;					// Sets the timer interval to 10 minutes.
-		myTimer->Start();
-
+		conDataBase1->Close();
 	}
 
 			 void static setAttendence(int stid, int y){

@@ -11,9 +11,13 @@
 #include <sstream>
 #include <iostream> 
 #include <string>
+#include<iostream>
 
 
+
+using namespace cv;
 using namespace std;
+
 
 
 
@@ -58,17 +62,17 @@ namespace Group4_Class_Attendance_System {
 		}
 
 	public:
-		String^ constring;
+		System::String^ constring;
 		MySqlConnection^ conDataBase;
 
 		MySqlDataReader^ myReader;
-		static String^ studentName;
-		static String^ studentSurname;
-		static int studentID;
-		static int NoOfDaysPresent;
-		static int NoOfDaysAbsent;
-		static int NoOfDaysCameLate;
-		static int NoOfDaysLeftEarly;
+		static System::String^ studentName = " ";
+		static System::String^ studentSurname = " ";
+		static int studentID = 0;
+		static int NoOfDaysPresent = 0;
+		static int NoOfDaysAbsent = 0;
+		static int NoOfDaysCameLate = 0;
+		static int NoOfDaysLeftEarly = 0;
 
 	private: System::Windows::Forms::TextBox^  srchtextBox;
 	protected:
@@ -95,6 +99,7 @@ namespace Group4_Class_Attendance_System {
 
 	private: System::Windows::Forms::TextBox^  abtextBox;
 	private: System::Windows::Forms::TextBox^  earlytextBox;
+
 
 
 
@@ -279,7 +284,7 @@ namespace Group4_Class_Attendance_System {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(280, 309);
+			this->ClientSize = System::Drawing::Size(282, 314);
 			this->Controls->Add(this->earlytextBox);
 			this->Controls->Add(this->abtextBox);
 			this->Controls->Add(this->latetextBox);
@@ -309,7 +314,7 @@ namespace Group4_Class_Attendance_System {
 
 
 	private: System::Void Attendance_Stats_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
-		constring = L"datasource=127.0.0.1; port=3306; username=root; password=keshav";
+		constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 		conDataBase = gcnew MySqlConnection(constring);
 	}
 			
@@ -321,9 +326,9 @@ namespace Group4_Class_Attendance_System {
 		displayData();
 	}
 			 void getData(int stdNo){
-				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where ID = '" + stdNo + "';", conDataBase);
+				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where studentID = '" + stdNo + "';", conDataBase);
 				 try{
-
+					 conDataBase->Close();
 					 conDataBase->Open();
 					 myReader = cmdDataBase->ExecuteReader();
 					 while (myReader->Read())
@@ -331,23 +336,34 @@ namespace Group4_Class_Attendance_System {
 						 for (int i = 1; i <= 25; i++)
 						 {
 
-							 if (myReader->GetString("Lecture" + i) == "a")
+							 if (myReader->GetString("Lecture" + i) == "absent")
 							 {
 								 NoOfDaysAbsent++;
 							 }
-							 else
+							 else if (myReader->GetString("Lecture" + i) == "present")
 							 {
 								 NoOfDaysPresent++;
 							 }
+							 else if (myReader->GetString("Lecture" + i) == "came late")
+							 {
+								 NoOfDaysCameLate++;
+							 }
+							 else if (myReader->GetString("Lecture" + i) == "left early")
+							 {
+								 NoOfDaysLeftEarly++;
+							 }
 						 }
-						 studentID = myReader->GetInt32("ID");
+						 studentID = myReader->GetInt32("StudentID");
 						 studentName = myReader->GetString("Name");
 						 studentSurname = myReader->GetString("Surname");
 					 }
-				 }
-				 catch (Exception^ ex){
 
-					 MessageBox::Show(ex->Message);
+					 
+					 
+				 }
+				 catch (System::Exception^ ex){
+
+					MessageBox::Show(ex->Message);
 				 }
 
 			 }
@@ -357,6 +373,13 @@ namespace Group4_Class_Attendance_System {
 				 snametextBox->Text = studentSurname;
 				 abtextBox->Text = Convert::ToString(NoOfDaysAbsent);
 				 prtextBox->Text = Convert::ToString(NoOfDaysPresent);
+				 latetextBox->Text = Convert::ToString(NoOfDaysCameLate);
+				 earlytextBox->Text = Convert::ToString(NoOfDaysLeftEarly);
+
+				 NoOfDaysPresent = 0;
+				 NoOfDaysAbsent = 0;
+				 NoOfDaysCameLate = 0;
+				 NoOfDaysLeftEarly = 0;
 			 }
 };
 }
