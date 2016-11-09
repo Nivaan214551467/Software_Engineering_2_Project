@@ -13,8 +13,6 @@
 #include <string>
 #include<iostream>
 
-
-
 using namespace cv;
 using namespace std;
 
@@ -99,6 +97,7 @@ namespace Group4_Class_Attendance_System {
 
 	private: System::Windows::Forms::TextBox^  abtextBox;
 	private: System::Windows::Forms::TextBox^  earlytextBox;
+	private: System::Windows::Forms::Button^  button1;
 
 
 
@@ -133,6 +132,7 @@ namespace Group4_Class_Attendance_System {
 			this->latetextBox = (gcnew System::Windows::Forms::TextBox());
 			this->abtextBox = (gcnew System::Windows::Forms::TextBox());
 			this->earlytextBox = (gcnew System::Windows::Forms::TextBox());
+			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// srchtextBox
@@ -280,11 +280,22 @@ namespace Group4_Class_Attendance_System {
 			this->earlytextBox->Size = System::Drawing::Size(52, 20);
 			this->earlytextBox->TabIndex = 16;
 			// 
+			// button1
+			// 
+			this->button1->Location = System::Drawing::Point(195, 279);
+			this->button1->Name = L"button1";
+			this->button1->Size = System::Drawing::Size(75, 23);
+			this->button1->TabIndex = 17;
+			this->button1->Text = L"Close";
+			this->button1->UseVisualStyleBackColor = true;
+			this->button1->Click += gcnew System::EventHandler(this, &Attendance_Stats_Screen::button1_Click);
+			// 
 			// Attendance_Stats_Screen
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(282, 314);
+			this->Controls->Add(this->button1);
 			this->Controls->Add(this->earlytextBox);
 			this->Controls->Add(this->abtextBox);
 			this->Controls->Add(this->latetextBox);
@@ -381,5 +392,8 @@ namespace Group4_Class_Attendance_System {
 				 NoOfDaysCameLate = 0;
 				 NoOfDaysLeftEarly = 0;
 			 }
+private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+	this->Close();
+}
 };
 }
