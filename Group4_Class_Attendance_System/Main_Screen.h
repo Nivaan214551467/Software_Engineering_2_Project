@@ -222,7 +222,7 @@ namespace Group4_Class_Attendance_System {
 				myTimer->Tick += gcnew EventHandler(TimerEventProcessor);
 				myTimer->Interval = 2000;									// Sets the timer interval to 10 minutes.
 				myTimer->Start();											//Starts the timer
-			}		
+			}
 		}
 		catch (System::Exception^ ex){
 
@@ -231,200 +231,200 @@ namespace Group4_Class_Attendance_System {
 		conDataBase1->Close();
 	}
 
-	void static setAttendence(int stid, int y){
+			 void static setAttendence(int stid, int y){
 
 		 std::string qtr;				//Used to alter the SQL
-		 if (y == 1)
-			 qtr = "quarter1";
-		 else if (y == 2)
-			 qtr = "quarter2";
-		 else if (y == 3)
-			 qtr = "quarter3";
-		 else
-			 qtr = "quarter4";
+				 if (y == 1)
+					 qtr = "quarter1";
+				 else if (y == 2)
+					 qtr = "quarter2";
+				 else if (y == 3)
+					 qtr = "quarter3";
+				 else
+					 qtr = "quarter4";
 
 		 //Marks student present for quarter defined by y
 
-		 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-		 conDataBase = gcnew MySqlConnection(constring);
-		 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `" + qtr + "`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
-		 System::String^ sql2 = gcnew System::String(sql1.c_str());
-		 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
-		 
-		 try{
-			 conDataBase->Open();
-			 myReader = cmdDataBase->ExecuteReader();
-			 while (myReader->Read()){
-			  }
-			 }
-			 catch (System::Exception^ ex){
-				 MessageBox::Show(ex->Message);
-			 }
-		 conDataBase->Close(); 
-	}
+				 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+				 conDataBase = gcnew MySqlConnection(constring);
+				 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `" + qtr + "`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
+				 System::String^ sql2 = gcnew System::String(sql1.c_str());
+				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
 
-	static void captureImage()
-	{
+				 try{
+					 conDataBase->Open();
+					 myReader = cmdDataBase->ExecuteReader();
+			 while (myReader->Read()){
+					 }
+				 }
+				 catch (System::Exception^ ex){
+					 MessageBox::Show(ex->Message);
+				 }
+				 conDataBase->Close();
+			 }
+
+			 static void captureImage()
+			 {
 		Mat capturedImage;					//Stores the captured image
 		 vector<Mat> faces;					//Stores the images used for comparisons
 		 vector<int> ids;					//Stores the IDs of the images
-		 
+
 		 read_csv("C:/Class_Attendance_System_Files/csv_file.csv", faces, ids);		//Fills the faces and ids vectors
 
 		 int im_width = faces[0].cols;		//Gets width and height of the images used for comparisons
-		 int im_height = faces[0].rows;
+				 int im_height = faces[0].rows;
 
-		 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
+				 Ptr<FaceRecognizer> model = createFisherFaceRecognizer();
 		 model->train(faces, ids);			//Creates a face recognizer, trains it with the images used for comparisons
 
 		 CascadeClassifier haar_cascade;		//Chooses haar-cascade that is used for face detection
-		 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
+				 haar_cascade.load("C:/Class_Attendance_System_Files/haarcascade_frontalface_default.xml");
 
 		 VideoCapture cap;						//Opens a video feed
-		 cap.open(0);
+				 cap.open(0);
 
-		 if (!cap.isOpened())
-		 {
-			 MessageBox::Show("ERROR: Could not open camera.");
-		 }
-			
+				 if (!cap.isOpened())
+				 {
+					 MessageBox::Show("ERROR: Could not open camera.");
+				 }
+
 		 cap >> capturedImage;						//Captures an image and stores in the captruedImage
 
 		 Mat original = capturedImage.clone();		//Keeps a copy of the original image
-		 Mat greyImage;
+				 Mat greyImage;
 		 cvtColor(capturedImage, greyImage, CV_BGR2GRAY);		//Converts the image to greyscale
 
-		 vector<Rect_<int>> facePositions;
+				 vector<Rect_<int>> facePositions;
 		 haar_cascade.detectMultiScale(greyImage, facePositions);		//Gets the positions of the deteced faces from the image
 
-		 for (int i = 0; i < facePositions.size(); i++)
-		 {
+				 for (int i = 0; i < facePositions.size(); i++)
+				 {
 			 Rect face_i = facePositions[i];						//Position of the ith face
 			 Mat getFace = greyImage(face_i);						//Converts to greyscale
 			 Mat face_resized;										//Resizes the detected face 
-			 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
+					 cv::resize(getFace, face_resized, cv::Size(im_width, im_height), 1.0, 1.0, INTER_CUBIC);
 			 int foundID = model->predict(face_resized);			//Gets predicition from face recognizer
 			 setAttendence(foundID, quarter);						//Calls the setAttendance method. Sends the recognized ID as a parameter
 
 			 rectangle(original, face_i, CV_RGB(0, 255, 0), 1);		//Places rectangle over detected face and ID of the recognized faces
-			 string box_text = format("ID = %d", foundID);
-			 int pos_x = std::max(face_i.tl().x - 10, 0);
-			 int pos_y = std::max(face_i.tl().y - 10, 0);
-			 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
-		 }
+					 string box_text = format("ID = %d", foundID);
+					 int pos_x = std::max(face_i.tl().x - 10, 0);
+					 int pos_y = std::max(face_i.tl().y - 10, 0);
+					 putText(original, box_text, cv::Point(pos_x, pos_y), FONT_HERSHEY_PLAIN, 1.0, CV_RGB(0, 255, 0), 2.0);///////
+				 }
 
 		 imshow("face_recognizer", original);						//Shows original image with recognized faces and their IDs
-		 
+
 		 if (quarter == 4)								//This is executed after all four quarters have been captured
-		 {
+				 {
 			 std::string sql1 = "SELECT * FROM `studentattendancedb`.`studentattendancetbl`;";		//Reads details of every student
-			 System::String^ sql2 = gcnew System::String(sql1.c_str());
-			 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
-			 
-			 try{
-				 conDataBase->Open();
-				 myReader = cmdDataBase->ExecuteReader();
+					 System::String^ sql2 = gcnew System::String(sql1.c_str());
+					 MySqlCommand^ cmdDataBase = gcnew MySqlCommand(sql2, conDataBase);
+
+					 try{
+						 conDataBase->Open();
+						 myReader = cmdDataBase->ExecuteReader();
 				 richTextBox1->Text += "\nSetting final attendance.";
 				 while (myReader->Read())									//Loop runs for every student
-				 {
+						 {
 					 quarter1 = myReader->GetString("quarter1");			//Gets the required data
-					 quarter2 = myReader->GetString("quarter2");
-					 quarter3 = myReader->GetString("quarter3");
-					 quarter4 = myReader->GetString("quarter4");
-					 int stID = myReader->GetInt32("studentID");
-					 int i = 0;
+							 quarter2 = myReader->GetString("quarter2");
+							 quarter3 = myReader->GetString("quarter3");
+							 quarter4 = myReader->GetString("quarter4");
+							 int stID = myReader->GetInt32("studentID");
+							 int i = 0;
 
-					 if (quarter1 == "present")
-						 i = i + 1;
-					 if (quarter2 == "present")
-						 i = i + 1;
-					 if (quarter3 == "present")
-						 i = i + 1;
-					 if (quarter4 == "present")
-						 i = i + 1;
+							 if (quarter1 == "present")
+								 i = i + 1;
+							 if (quarter2 == "present")
+								 i = i + 1;
+							 if (quarter3 == "present")
+								 i = i + 1;
+							 if (quarter4 == "present")
+								 i = i + 1;
 
 					 if (i == 4 || (quarter1 == "present" && quarter4 == "present"))		//Conditions for present
-					 {
-						 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-						 conDataBase2 = gcnew MySqlConnection(constring);
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'present' WHERE `studentID` = '"+std::to_string(stID)+"';";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
-						 conDataBase2->Open();
-						 myReader2 = cmdDataBase1->ExecuteReader();
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'present' WHERE `studentID` = '"+std::to_string(stID)+"';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
 						 richTextBox1->Text += "\nMarking "+ stID + " as Present.";
-						 conDataBase2->Close();
-					 }
+								 conDataBase2->Close();
+							 }
 					 else if ((i == 2 || i == 3) && quarter1 != "present")					//Conditions for 'Came late'
-					 {
-						 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-						 conDataBase2 = gcnew MySqlConnection(constring);
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'came late' WHERE `studentID` = '" + std::to_string(stID) + "';";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
-						 conDataBase2->Open();
-						 myReader2 = cmdDataBase1->ExecuteReader();
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'came late' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
 						 richTextBox1->Text += "\nMarking " + stID + " as Came late.";
-						 conDataBase2->Close();
-					 }
+								 conDataBase2->Close();
+							 }
 					 else if (i == 2 || i == 3 && quarter4 != "present")					//Conditions for 'Left early'
-					 {
-						 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-						 conDataBase2 = gcnew MySqlConnection(constring);
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'left early' WHERE `studentID` = '" + std::to_string(stID) + "';";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
-						 conDataBase2->Open();
-						 myReader2 = cmdDataBase1->ExecuteReader();
+							 {
+								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'left early' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
 						 richTextBox1->Text += "\nMarking " + stID + " as Left early.";
-						 conDataBase2->Close();
-					 }
-					 else
+								 conDataBase2->Close();
+							 }
+							 else
 					 {																		//mark stduent absent
 						 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
-						 conDataBase2 = gcnew MySqlConnection(constring);
-						 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'absent' WHERE `studentID` = '" + std::to_string(stID) + "';";
-						 System::String^ sql2 = gcnew System::String(sql1.c_str());
-						 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
-						 conDataBase2->Open();
-						 myReader2 = cmdDataBase1->ExecuteReader();
+								 conDataBase2 = gcnew MySqlConnection(constring);
+								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'absent' WHERE `studentID` = '" + std::to_string(stID) + "';";
+								 System::String^ sql2 = gcnew System::String(sql1.c_str());
+								 MySqlCommand^ cmdDataBase1 = gcnew MySqlCommand(sql2, conDataBase2);
+								 conDataBase2->Open();
+								 myReader2 = cmdDataBase1->ExecuteReader();
 						 richTextBox1->Text += "\nMarking " + stID + " as Absent.";
-						 conDataBase2->Close();
+								 conDataBase2->Close();
+							 }
+						 }
+					 }
+					 catch (System::Exception^ ex){
+						 MessageBox::Show(ex->Message);
+					 }
+					 conDataBase->Close();
+				 }
+		 quarter++;				//move to next quarter
+			 }
+
+			 static void read_csv(const string& filepath, vector<Mat>& images, vector<int>& labels)
+			 {
+				 std::ifstream file(filepath.c_str(), ifstream::in);
+				 if (!file)
+				 {
+					 MessageBox::Show("ERROR: Could not read CSV file.");
+				 }
+				 string line, path, classlabel;
+		 while (getline(file, line))					//Loop runs for every line of the CSV file
+				 {
+					 stringstream liness(line);
+			 getline(liness, path, ';');				//Delimiter seperates data
+					 getline(liness, classlabel);
+					 if (!path.empty() && !classlabel.empty())
+					 {
+				 images.push_back(imread(path, 0));				//Stores image in vector
+				 labels.push_back(atoi(classlabel.c_str()));	//Stores ID in vector
 					 }
 				 }
 			 }
-			 catch (System::Exception^ ex){
-				 MessageBox::Show(ex->Message);
-			 }
-			 conDataBase->Close();
-		 }
-		 quarter++;				//move to next quarter
-	 }
-
-	 static void read_csv(const string& filepath, vector<Mat>& images, vector<int>& labels)
-	 {
-		 std::ifstream file(filepath.c_str(), ifstream::in);
-		 if (!file)
-		 {
-			 MessageBox::Show("ERROR: Could not read CSV file.");
-		 }
-		 string line, path, classlabel;
-		 while (getline(file, line))					//Loop runs for every line of the CSV file
-		 {
-			 stringstream liness(line);
-			 getline(liness, path, ';');				//Delimiter seperates data
-			 getline(liness, classlabel);
-			 if (!path.empty() && !classlabel.empty())
-			 {			
-				 images.push_back(imread(path, 0));				//Stores image in vector
-				 labels.push_back(atoi(classlabel.c_str()));	//Stores ID in vector
-			 }
-		 }
-	 }
 
 	private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
 		Attendance_Stats_Screen^ ass = gcnew Attendance_Stats_Screen();				//Displays the attendance stats screen
 		ass->ShowDialog();
-	}	
-};
+	}
+	};
 }
