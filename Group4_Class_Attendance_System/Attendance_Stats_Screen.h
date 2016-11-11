@@ -4,7 +4,7 @@
 #include <opencv2\core.hpp>
 #include <opencv2\contrib\contrib.hpp>
 #include <opencv2\highgui.hpp>
-#include <opencv2\imgproc.hpp>
+#include <opencv2\imgproc.hpp>				// including all required libraries and header files
 #include <opencv2\objdetect.hpp>
 #include <iostream>
 #include <fstream>
@@ -60,17 +60,17 @@ namespace Group4_Class_Attendance_System {
 		}
 
 	public:
-		System::String^ constring;
-		MySqlConnection^ conDataBase;
+		System::String^ constring; // connection string variable to connect to database
+		MySqlConnection^ conDataBase; // connection variable to create database connection
 
-		MySqlDataReader^ myReader;
-		static System::String^ studentName = " ";
-		static System::String^ studentSurname = " ";
-		static int studentID = 0;
-		static int NoOfDaysPresent = 0;
-		static int NoOfDaysAbsent = 0;
-		static int NoOfDaysCameLate = 0;
-		static int NoOfDaysLeftEarly = 0;
+		MySqlDataReader^ myReader; // reader variable to read from database
+		static System::String^ studentName; // stores student's name
+		static System::String^ studentSurname; // stores student's surname
+		static int studentID = 0; // stores student number
+		static int NoOfDaysPresent = 0; // stores number of days present
+		static int NoOfDaysAbsent = 0; // stores number of days absent
+		static int NoOfDaysCameLate = 0; // stores number of days late
+		static int NoOfDaysLeftEarly = 0; // stores number of days left early
 
 	private: System::Windows::Forms::TextBox^  srchtextBox;
 	protected:
@@ -325,48 +325,49 @@ namespace Group4_Class_Attendance_System {
 
 
 	private: System::Void Attendance_Stats_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
-		constring = L"datasource=localhost; port=3306; username=root; password=keshav";
-		conDataBase = gcnew MySqlConnection(constring);
+		constring = L"datasource=localhost; port=3306; username=root; password=keshav"; // connection string to connect to database
+		conDataBase = gcnew MySqlConnection(constring); // creates new connection
 	}
 			
 
 	private: System::Void searchBtn_Click(System::Object^  sender, System::EventArgs^  e) {
 
-		studentID = Int32::Parse(srchtextBox->Text);
-		getData(studentID);
-		displayData();
+		studentID = Int32::Parse(srchtextBox->Text); // gets the student number entered by the user in the text box and converts it to an integer
+		getData(studentID); // function to get data
+		displayData(); // function to display data
 	}
 			 void getData(int stdNo){
-				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where studentID = '" + stdNo + "';", conDataBase);
+				 MySqlCommand^ cmdDataBase = gcnew MySqlCommand("select * from studentattendancedb.studentattendancetbl where studentID = '" + stdNo + "';", conDataBase); // SQL statement to obtain information from database
 				 try{
-					 conDataBase->Close();
-					 conDataBase->Open();
-					 myReader = cmdDataBase->ExecuteReader();
-					 while (myReader->Read())
+					 conDataBase->Close(); // closes connection to database
+					 conDataBase->Open(); // opens connection to database
+					 myReader = cmdDataBase->ExecuteReader(); // runs the reader to read from database
+
+					 while (myReader->Read()) // reads data from database while there is still information to be read
 					 {
 						 for (int i = 1; i <= 25; i++)
 						 {
 
 							 if (myReader->GetString("Lecture" + i) == "absent")
 							 {
-								 NoOfDaysAbsent++;
+								 NoOfDaysAbsent++; // counts the number of days absent
 							 }
 							 else if (myReader->GetString("Lecture" + i) == "present")
 							 {
-								 NoOfDaysPresent++;
+								 NoOfDaysPresent++; // counts the number of days present
 							 }
 							 else if (myReader->GetString("Lecture" + i) == "came late")
 							 {
-								 NoOfDaysCameLate++;
+								 NoOfDaysCameLate++; // counts the number of days arrived late 
 							 }
 							 else if (myReader->GetString("Lecture" + i) == "left early")
 							 {
-								 NoOfDaysLeftEarly++;
+								 NoOfDaysLeftEarly++; // counts the number of days left early
 							 }
 						 }
-						 studentID = myReader->GetInt32("StudentID");
-						 studentName = myReader->GetString("Name");
-						 studentSurname = myReader->GetString("Surname");
+						 studentID = myReader->GetInt32("StudentID"); // reads the student number from database and converts it to an integer
+						 studentName = myReader->GetString("Name"); // reads student's name from the database
+						 studentSurname = myReader->GetString("Surname"); //reads student's surname from the database
 					 }
 
 					 
@@ -379,21 +380,21 @@ namespace Group4_Class_Attendance_System {
 
 			 }
 			 void displayData(){
-				 textBox3->Text = Convert::ToString(studentID);
-				 nametextBox->Text = studentName;
-				 snametextBox->Text = studentSurname;
-				 abtextBox->Text = Convert::ToString(NoOfDaysAbsent);
-				 prtextBox->Text = Convert::ToString(NoOfDaysPresent);
-				 latetextBox->Text = Convert::ToString(NoOfDaysCameLate);
-				 earlytextBox->Text = Convert::ToString(NoOfDaysLeftEarly);
+				 textBox3->Text = Convert::ToString(studentID); // converts student number from integer to string and displays it in the text box
+				 nametextBox->Text = studentName; // displays student's name in textbox
+				 snametextBox->Text = studentSurname;// displays student's surname in textbox
+				 abtextBox->Text = Convert::ToString(NoOfDaysAbsent); // converts number of days absent from integer to string and displays it in the text box
+				 prtextBox->Text = Convert::ToString(NoOfDaysPresent); // converts number of days present from integer to string and displays it in the text box
+				 latetextBox->Text = Convert::ToString(NoOfDaysCameLate); // converts number of days came late from integer to string and displays it in the text box
+				 earlytextBox->Text = Convert::ToString(NoOfDaysLeftEarly); // converts number of days left early from integer to string and displays it in the text box
 
-				 NoOfDaysPresent = 0;
-				 NoOfDaysAbsent = 0;
+				 NoOfDaysPresent = 0;  
+				 NoOfDaysAbsent = 0;					// resets all counts after first display
 				 NoOfDaysCameLate = 0;
 				 NoOfDaysLeftEarly = 0;
 			 }
 private: System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
-	this->Close();
+	this->Close(); // closes attendance stats screen
 }
 };
 }
