@@ -325,7 +325,7 @@ namespace Group4_Class_Attendance_System {
 
 
 	private: System::Void Attendance_Stats_Screen_Load(System::Object^  sender, System::EventArgs^  e) {
-		constring = L"datasource=localhost; port=3306; username=root; password=keshav"; // connection string to connect to database
+		constring = L"datasource=localhost; port=3306; username=root; password=password@0105"; // connection string to connect to database
 		conDataBase = gcnew MySqlConnection(constring); // creates new connection
 	}
 			
