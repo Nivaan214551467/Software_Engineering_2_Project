@@ -61,6 +61,7 @@ namespace Group4_Class_Attendance_System {
 		static System::String^ quarter2;					//Stores the presence of a student in quater2
 		static System::String^ quarter3;					//Stores the presence of a student in quater3
 		static System::String^ quarter4;					//Stores the presence of a student in quater4
+		
 
 	private: 
 		System::Windows::Forms::ComboBox^  lectrueNumComboBox;
@@ -68,8 +69,8 @@ namespace Group4_Class_Attendance_System {
 		System::Windows::Forms::Label^  chosenLecturelbl;
 		System::Windows::Forms::Button^  button1;
 		System::ComponentModel::Container ^components;
-		static System::Windows::Forms::RichTextBox^  richTextBox1;
-		System::Windows::Forms::Label^  label1;
+	    static System::Windows::Forms::RichTextBox^  richTextBox1;
+        System::Windows::Forms::Label^  label1;
 
 #pragma region Windows Form Designer generated code
 
@@ -426,5 +427,5 @@ namespace Group4_Class_Attendance_System {
 		Attendance_Stats_Screen^ ass = gcnew Attendance_Stats_Screen();				//Displays the attendance stats screen
 		ass->ShowDialog();
 	}
-	};
+};
 }

@@ -389,7 +389,7 @@ namespace Group4_Class_Attendance_System {
 				 earlytextBox->Text = Convert::ToString(NoOfDaysLeftEarly); // converts number of days left early from integer to string and displays it in the text box
 
 				 NoOfDaysPresent = 0;  
-				 NoOfDaysAbsent = 0;					// resets all counts after first display
+				 NoOfDaysAbsent = 0;					// resets all counts for next display
 				 NoOfDaysCameLate = 0;
 				 NoOfDaysLeftEarly = 0;
 			 }
