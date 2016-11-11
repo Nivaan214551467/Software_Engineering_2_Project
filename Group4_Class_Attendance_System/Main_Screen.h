@@ -183,7 +183,7 @@ namespace Group4_Class_Attendance_System {
 	private: System::Void lectrueNumComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 		//this method runs when the lecture number is chosen from the combo box
 
-		constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+		constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 		lectureNumber = Convert::ToInt32(this->lectrueNumComboBox->SelectedItem::get());		//Stores the lecture number
 
 		conDataBase1 = gcnew MySqlConnection(constring);
@@ -246,7 +246,7 @@ namespace Group4_Class_Attendance_System {
 
 		 //Marks student present for quarter defined by y
 
-				 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+				 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 				 conDataBase = gcnew MySqlConnection(constring);
 				 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `" + qtr + "`= 'present' WHERE `studentID`= " + std::to_string(stid) + ";";
 				 System::String^ sql2 = gcnew System::String(sql1.c_str());
@@ -346,7 +346,7 @@ namespace Group4_Class_Attendance_System {
 
 					 if (i == 4 || (quarter1 == "present" && quarter4 == "present"))		//Conditions for present
 							 {
-								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 								 conDataBase2 = gcnew MySqlConnection(constring);
 								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'present' WHERE `studentID` = '"+std::to_string(stID)+"';";
 								 System::String^ sql2 = gcnew System::String(sql1.c_str());
@@ -358,7 +358,7 @@ namespace Group4_Class_Attendance_System {
 							 }
 					 else if ((i == 2 || i == 3) && quarter1 != "present")					//Conditions for 'Came late'
 							 {
-								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 								 conDataBase2 = gcnew MySqlConnection(constring);
 								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'came late' WHERE `studentID` = '" + std::to_string(stID) + "';";
 								 System::String^ sql2 = gcnew System::String(sql1.c_str());
@@ -370,7 +370,7 @@ namespace Group4_Class_Attendance_System {
 							 }
 					 else if (i == 2 || i == 3 && quarter4 != "present")					//Conditions for 'Left early'
 							 {
-								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 								 conDataBase2 = gcnew MySqlConnection(constring);
 								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'left early' WHERE `studentID` = '" + std::to_string(stID) + "';";
 								 System::String^ sql2 = gcnew System::String(sql1.c_str());
@@ -382,7 +382,7 @@ namespace Group4_Class_Attendance_System {
 							 }
 							 else
 					 {																		//mark stduent absent
-								 constring = L"datasource=localhost; port=3306; username=root; password=keshav";
+								 constring = L"datasource=localhost; port=3306; username=root; password=password@0105";
 								 conDataBase2 = gcnew MySqlConnection(constring);
 								 std::string sql1 = "UPDATE `studentattendancedb`.`studentattendancetbl` SET `lecture" + std::to_string(lectureNumber) + "`= 'absent' WHERE `studentID` = '" + std::to_string(stID) + "';";
 								 System::String^ sql2 = gcnew System::String(sql1.c_str());
